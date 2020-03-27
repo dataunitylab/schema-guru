@@ -28,7 +28,7 @@ object Dependencies {
     val jsonValidator    = "2.2.3"
     val commonsValidator = "1.6"
     // Scala
-    val scopt            = "3.4.0"
+    val scopt            = "3.7.1"
     val scalaz7          = "7.0.8"
     val json4s           = "3.2.10"   // don't upgrade to 3.2.11 https://github.com/json4s/json4s/issues/212
     val jsonpath         = "0.6.4"
