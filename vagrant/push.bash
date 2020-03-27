@@ -5,7 +5,7 @@ set -e
 bintray_package=schema-guru
 bintray_user=snowplowbot
 bintray_repository=snowplow/snowplow-generic
-scala_version=2.10
+scala_version=2.11
 guest_repo_path=/vagrant
 dist_path=dist
 
