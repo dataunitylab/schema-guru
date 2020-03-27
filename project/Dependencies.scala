@@ -22,7 +22,7 @@ object Dependencies {
 
   object V {
     // Java
-    val yodaTime         = "2.1"
+    val yodaTime         = "2.10.5"
     val yodaConvert      = "1.2"
     val jacksonDatabind  = "2.5.4"
     val jsonValidator    = "2.2.3"
