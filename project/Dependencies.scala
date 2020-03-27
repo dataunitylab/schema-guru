@@ -26,7 +26,7 @@ object Dependencies {
     val yodaConvert      = "1.2"
     val jacksonDatabind  = "2.10.3"
     val jsonValidator    = "2.2.3"
-    val commonsValidator = "1.4.1"
+    val commonsValidator = "1.6"
     // Scala
     val scopt            = "3.4.0"
     val scalaz7          = "7.0.8"
