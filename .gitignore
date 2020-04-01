@@ -2,7 +2,6 @@
 *.log
 .idea
 .DS_Store
-*.pyc
 
 # Scala worksheets
 src/test/scala/*.sc
@@ -17,6 +16,10 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+
+# Python
+*.pyc
+.mypy_cache/
 
 # Vagrant
 .vagrant
