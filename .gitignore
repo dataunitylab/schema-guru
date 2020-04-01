@@ -24,3 +24,7 @@ project/plugins/project/
 # Vagrant
 .vagrant
 VERSION
+
+# Generated files
+jsonpaths/
+sql/
