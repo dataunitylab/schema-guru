@@ -34,7 +34,7 @@ object Dependencies {
     val jsonpath         = "0.6.4"
     val schemaddl        = "0.3.1"
     val akka             = "2.5.30"
-    val spray            = "1.3.3"
+    val spray            = "1.3.4"
     val spark            = "1.3.1"
     // Scala (test only)
     val specs2           = "2.3.13"
