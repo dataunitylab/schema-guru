@@ -21,27 +21,11 @@ import scalaz._
 // json4s
 import org.json4s._
 
-// Schema DDL
-import com.snowplowanalytics.schemaddl.generators.redshift.RedshiftMigration
-
 // This library
 import schemaguru.Common.{ JsonFile, SchemaDescription }
 import schemaguru.schema.JsonSchema
 
 package object schemaguru {
-  /**
-   * Map of Schemas to all its possible target schemas
-   * Examples:
-   * com.acme/event/1-0-0    -> [1-0-0/1-0-1, 1-0-0/1-0-2, 1-0-0/1-0-3]
-   * com.acme/event/1-0-1    -> [1-0-1/1-0-2, 1-0-1/1-0-3]
-   * com.acme/event/1-0-2    -> [1-0-2/1-0-3]
-   * com.acme/config/1-1-0   -> [1-1-0/1-0-1]
-   */
-  type MigrationMap = Map[SchemaDescription, List[RedshiftMigration]]
-
-  type ValidMigrationMap = Map[SchemaDescription, Validation[String, List[RedshiftMigration]]]
-
-
   /**
    * Schema criterion restricted to revision: vendor/name/m-r-*
    * Tuple using as root key to bunch of Schemas differing only by addition
@@ -51,16 +35,6 @@ package object schemaguru {
   type RevisionCriterion = (String, String, Int, Int)
 
   type ModelCriterion = (String, String, Int)
-
-  /**
-   * Intermediate nested structure used to group schemas by revision
-   * Examples:
-   * com.acme/event/1-0-*    -> [[MigrationMap]]
-   * com.acme/event/1-1-*    -> [[MigrationMap]]
-   * com.acme/config/1-1-*   -> [[MigrationMap]]
-   * com.google/schema/1-0-* -> [[MigrationMap]]
-   */
-  type GroupedMigrationMap = Map[RevisionCriterion, MigrationMap]
 
   /**
    * List of Schema properties

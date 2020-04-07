@@ -7,11 +7,10 @@ Schema Guru is a tool (CLI, Spark job and web) allowing you to derive **[JSON Sc
 Current primary features include:
 
 - Derivation of JSON Schema from set of JSON instances (``schema`` command)
-- Generation of **[Redshift] [redshift]** table DDL and a JSONPath file (``ddl`` command)
 
 Unlike other tools for deriving JSON Schemas, Schema Guru allows you to derive schema from an unlimited set of instances (making schemas much more precise), and supports many more JSON Schema validation properties.
 
-Schema Guru is used heavily in association with Snowplow's own **[Snowplow] [snowplow]**, **[Iglu] [iglu]** and **[Schema DDL] [schema-ddl]** projects.
+Schema Guru is used heavily in association with Snowplow's own **[Snowplow] [snowplow]**, **[Iglu] [iglu]**.
 
 ## User Quickstart
 
@@ -87,88 +86,6 @@ To avoid this too strict Schema, you can use `--no-length` option.
 ```bash
 $ ./schema-guru schema --no-length /path/to/few-instances
 ```
-
-#### DDL derivation
-
-Like for Schema derivation, for DDL input may be also single JSON Schema file or a directory containing JSON Schemas.
-
-Currently we support DDL only for **[Amazon Redshift] [redshift]**, but in future releases you'll be able to specify another with ``--db`` option.
-
-The following command will just save Redshift (default ``--db`` value) DDL to the current directory.
-
-```bash
-$ ./schema-guru ddl {{input}}
-```
-
-If you specified as input a directory with several self-describing JSON Schemas belonging to a single revision, Schema Guru will also generate migrations.
-So, you can migrate any of the previous tables to any of subsequent.
-For example, having following list of Self-describing JSON Schemas as input:
-
-* schemas/com.acme/click_event/1-0-0
-* schemas/com.acme/click_event/1-0-1
-* schemas/com.acme/click_event/1-0-2
-
-You will have following migrations as output:
-
-* sql/com.acme/click_event/1-0-0/1-0-1 to alter table from 1-0-0 to 1-0-1
-* sql/com.acme/click_event/1-0-0/1-0-2 to alter table from 1-0-0 to 1-0-2
-* sql/com.acme/click_event/1-0-1/1-0-2 to alter table from 1-0-1 to 1-0-2
-
-This migrations (and all subsequent table definitions) are aware of column order and it will never put a new column in the middle of table,
-so you can safely alter your tables while they belong to a single revision.
-
-You also can specify directory for output:
-
-```bash
-$ ./schema-guru ddl --output {{ddl_dir}} {{input}}
-```
-
-If you're not a Snowplow Platform user, don't use **[self-describing Schema] [self-describing]** or just don't want anything specific to it you can produce raw schema:
-
-```bash
-$ ./schema-guru ddl --raw {{input}}
-```
-
-But bear in mind that self-describing Schemas bring many benefits. 
-For example, raw schemas will not preserve column order and also you will not have migrations.
-
-You may also want to get JSONPath file for Redshift's **[COPY] [redshift-copy]** command. It will place the ``jsonpaths`` directory alongside ``sql``:
-
-```bash
-$ ./schema-guru ddl --with-json-paths {{input}}
-```
-
-The most challenging part of shifting from a dynamic-typed world to a statically-typed one is product types (or union types) like this in JSON Schema: ``["integer", "string"]``.
-How can this be represented in SQL DDL?
-It's a tough question and we think there's no ideal solution.
-Thus we provide you two options.
-By default product types will be transformed to the most general ``VARCHAR(4096)``.
-But there's another way - you can split column with product types into separate ones with it's types as postfix.
-For example, the property ``model`` with type ``["string", "integer"]`` will be transformed into two columns ``mode_string`` and ``model_integer``.
-This behavior can be achieved with ``--split-product-types``.
-
-Another thing everyone need to consider is default `VARCHAR` size. If there's no clues about it (like ``maxLength``), then 4096 will be used.
-You can also specify this default value:
-
-```bash
-$ ./schema-guru ddl --varchar-size 32 {{input}}
-```
-
-You can also specify Redshift Schema for your table. For non-raw mode ``atomic`` used as default.
-
-```bash
-$ ./schema-guru ddl --raw --schema business {{input}}
-```
-
-Some users do not full rely on Schema Guru JSON Schema derivation or DDL generation and edit their DDL manually.
-By default, Schema Guru will not overwrite your files (DDL and migrations) if user made any significant changes (comments and whitespace are not significant).
-Instead Schema Guru will just warn user that file has been changed manually.
-To change this behavior you may specify the ``--force`` flag.
-
-```bash
-$ ./schema-guru ddl --force {{input}}
-```
-
 
 ### Web UI
 

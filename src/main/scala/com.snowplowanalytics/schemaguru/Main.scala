@@ -12,14 +12,13 @@
  */
 package com.snowplowanalytics.schemaguru
 
-import cli.{ CommandContainer, DdlCommand, SchemaCommand }
+import cli.{ CommandContainer, SchemaCommand }
 import cli.Parser._
 
 object Main extends App {
 
   parser.parse(args, CommandContainer(None)).flatMap(_.command) match {
     case Some(command: SchemaCommand) => command.processSchema()
-    case Some(command: DdlCommand)    => command.processDdl()
     case _                     	      => parser.showUsageAsError()
   }
 }

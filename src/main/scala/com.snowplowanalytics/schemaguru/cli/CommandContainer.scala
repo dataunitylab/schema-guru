@@ -37,14 +37,12 @@ case class CommandContainer(command: Option[SchemaGuruCommand] = None) {
   def setInput(input: File): Option[SchemaGuruCommand] =
     command match {
       case Some(schema: SchemaCommand) => Some(schema.copy(input = input))
-      case Some(ddl: DdlCommand) => Some(ddl.copy(input = input))
       case other => other
     }
 
   def setOutput(output: File): CommandContainer =
     command match {
       case Some(command: SchemaCommand) => this.copy(command = Some(command.copy(output = Some(output))))
-      case Some(command: DdlCommand)    => this.copy(command = Some(command.copy(output = output)))
       case other                        => this
     }
 
@@ -94,55 +92,6 @@ case class CommandContainer(command: Option[SchemaGuruCommand] = None) {
   def setNdjson(flag: Boolean): Option[SchemaGuruCommand] =
     command match {
       case Some(schema: SchemaCommand) => Some(schema.copy(ndjson = flag))
-      case other => other
-    }
-
-  // ddl
-  def setSchema(name: String): Option[DdlCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(schema = Some(name)))
-      case _ => None
-    }
-
-  def setDb(name: String): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(db = name))
-      case other => other
-    }
-
-  def setVarcharSize(n: Int): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(varcharSize = n))
-      case other => other
-    }
-
-  def setWithJsonPaths(flag: Boolean): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(withJsonPaths = flag))
-      case other => other
-    }
-
-  def setRawMode(flag: Boolean): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(rawMode = flag))
-      case other => other
-    }
-
-  def setSplitProduct(flag: Boolean): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(splitProduct = flag))
-      case other => other
-    }
-
-  def setNoHeader(flag: Boolean): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(noHeader = flag))
-      case other => other
-    }
-
-  def setForce(flag: Boolean): Option[SchemaGuruCommand] =
-    command match {
-      case Some(ddl: DdlCommand) => Some(ddl.copy(force = flag))
       case other => other
     }
 }
