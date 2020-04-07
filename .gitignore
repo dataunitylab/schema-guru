@@ -28,3 +28,6 @@ VERSION
 # Generated files
 jsonpaths/
 sql/
+
+# Metals
+.metals/
