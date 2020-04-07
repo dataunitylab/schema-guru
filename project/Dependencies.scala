@@ -39,7 +39,7 @@ object Dependencies {
     // Scala (test only)
     val specs2           = "2.3.13"
     val scalazSpecs2     = "0.2"
-    val scalaCheck       = "1.12.2"
+    val scalaCheck       = "1.12.6"
   }
 
   object Libraries {
