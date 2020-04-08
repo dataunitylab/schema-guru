@@ -15,7 +15,6 @@
  */
 import sbt._
 import Keys._
-import spray.revolver.RevolverPlugin.Revolver
 
 object SparkjobBuildSettings {
   import BuildSettings._
@@ -58,6 +57,5 @@ object SparkjobBuildSettings {
     commonSettings ++
     sparkjobSettings ++
     scalifySparkjobSettings ++
-    sbtAssemblySparkjobSettings ++
-    Revolver.settings
+    sbtAssemblySparkjobSettings
 }

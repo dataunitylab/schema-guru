@@ -15,7 +15,6 @@
  */
 import sbt._
 import Keys._
-import spray.revolver.RevolverPlugin.Revolver
 
 object WebuiBuildSettings {
   import BuildSettings._
@@ -65,6 +64,5 @@ object WebuiBuildSettings {
     webuiSettings ++
     gulpDeploySettings ++
     scalifyWebuiSettings ++
-    sbtAssemblyWebuiSettings ++
-    Revolver.settings
+    sbtAssemblyWebuiSettings
 }
