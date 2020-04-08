@@ -1,6 +1,8 @@
 # Schema Guru
 
-[ ![Build Status] [travis-image] ] [Travis]  [ ![Release] [release-image] ] [releases] [ ![License] [license-image] ] [license]
+[![Build Status](https://travis-ci.com/dataunitylab/schema-guru.svg?branch=master)](https://travis-ci.com/dataunitylab/schema-guru)
+[![Release](http://img.shields.io/badge/release-0.6.2-blue.svg?style=flat)](https://github.com/dataunitylab/schema-guru/releases)
+[![License](http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Schema Guru is a tool (CLI, Spark job and web) allowing you to derive **[JSON Schemas] [json-schema]** from a set of JSON instances process and transform it into different data definition formats.
 
@@ -332,15 +334,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[travis]: https://travis-ci.org/dataunitylab/schema-guru
-[travis-image]: https://travis-ci.org/dataunitylab/schema-guru.png?branch=master
-
-[license-image]: http://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
-[license]: http://www.apache.org/licenses/LICENSE-2.0
-
-[release-image]: http://img.shields.io/badge/release-0.6.2-blue.svg?style=flat
-[releases]: https://github.com/dataunitylab/schema-guru/releases
-
 [json-schema]: http://json-schema.org/
 
 [ndjson]: http://ndjson.org/
@@ -353,9 +346,6 @@ limitations under the License.
 [iglu]: https://github.com/snowplow/iglu
 [schema-ddl]: https://github.com/snowplow/schema-ddl
 [self-describing]: http://snowplowanalytics.com/blog/2014/05/15/introducing-self-describing-jsons/
-
-[redshift]: http://aws.amazon.com/redshift/
-[redshift-copy]: http://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html
 
 [vagrant-install]: http://docs.vagrantup.com/v2/installation/index.html
 [virtualbox-install]: https://www.virtualbox.org/wiki/Downloads
