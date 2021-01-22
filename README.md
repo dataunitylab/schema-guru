@@ -88,19 +88,6 @@ To avoid this too strict Schema, you can use `--no-length` option.
 ```bash
 $ ./schema-guru schema --no-length /path/to/few-instances
 ```
-
-### Web UI
-
-To run it locally:
-
-```bash
-$ wget http://dl.bintray.com/snowplow/snowplow-generic/schema_guru_webui_0.6.2.zip
-$ unzip schema_guru_webui_0.6.2.zip
-$ ./schema-guru-webui-0.6.2
-```
-
-The above will run a Spray web server containing Schema Guru on [0.0.0.0:8000] [webui-local]. Interface and port can be specified by `--interface` and `--port` respectively.
-
 ### Apache Spark
 
 Since version 0.4.0 Schema Guru ships with a Spark job for deriving JSON Schemas.
@@ -128,8 +115,6 @@ Also, instead of specifying some of predefined enum sets you can just enable it 
 ## Developer Quickstart
 
 Assuming git, [pyinvoke]: http://www.pyinvoke.org/
-
-[beanstalk-console]: http://console.aws.amazon.com/elasticbeanstalk
 
 [iso-4217]: https://en.wikipedia.org/wiki/ISO_4217
 [iso-3166-1-alpha-2]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2

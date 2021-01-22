@@ -17,7 +17,6 @@ import Keys._
 
 import Dependencies._
 import BuildSettings._
-import WebuiBuildSettings._
 import SparkjobBuildSettings._
 
 // Configure prompt to show current project.
@@ -48,22 +47,6 @@ lazy val project = Project("schema-guru", file("."))
       Libraries.scalaCheck
     )
   )
-
-lazy val webui = Project("schema-guru-webui", file("webui"))
-  .settings(webuiBuildSettings: _*)
-  .settings(compile in Compile := (compile in Compile).dependsOn(gulpDeployTask).value)
-  .settings(
-    libraryDependencies ++= Seq(
-      // Scala
-      Libraries.akka,
-      Libraries.sprayCan,
-      Libraries.sprayRouting,
-      // Scala (test only)
-      Libraries.specs2,
-      Libraries.sprayTestkit
-    )
-  )
-  .dependsOn(project)
 
 lazy val sparkjob = Project("schema-guru-sparkjob", file("sparkjob"))
   .settings(sparkjobBuildSettings: _*)
