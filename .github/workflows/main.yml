@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: coursier/cache-action@v5
       - uses: olafurpg/setup-scala@v10
       - name: Test
         run: sbt ++2.11.12 test
