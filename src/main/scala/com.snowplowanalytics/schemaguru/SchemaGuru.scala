@@ -36,7 +36,7 @@ object SchemaGuru {
    * @param context cardinality for detecting possible enums
    * @return result result of converting instances to micro-schemas
    */
-  def convertsJsonsToSchema(jsonList: List[JValue], context: SchemaContext): JsonConvertResult = {
+  def convertJsonsToSchema(jsonList: List[JValue], context: SchemaContext): JsonConvertResult = {
 
     val generator = SchemaGenerator(context)
 

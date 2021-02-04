@@ -137,6 +137,8 @@ object Helpers extends Serializable {
       extractKeys(items)
     case ProductSchema(obj, arr, _, _, _, _, _) =>
       obj.map(extractKeys(_)).getOrElse(Set.empty[String]) ++ arr.map(extractKeys(_)).getOrElse(Set.empty[String])
+    case ObjectProductSchema(objs) =>
+      objs.flatMap(extractKeys(_)).toSet
     case _ =>
       Set.empty[String]
   }

@@ -41,7 +41,7 @@ trait SchemaGuruRoutes extends HttpService with HttpJsonGetters with HttpOptions
               complete {
                 val (parseErrors, jsons) = splitValidations(getJsonFromRequest(formData))
                 val context = SchemaContext(getCardinality(formData), quantity = Some(formData.fields.length))
-                val convertResult = SchemaGuru.convertsJsonsToSchema(jsons, context)
+                val convertResult = SchemaGuru.convertJsonsToSchema(jsons, context)
                 val mergeResult = SchemaGuru.mergeAndTransform(convertResult, context)
                 val errors = getErrorsAsJson(mergeResult.errors ++ parseErrors)
                 compact(

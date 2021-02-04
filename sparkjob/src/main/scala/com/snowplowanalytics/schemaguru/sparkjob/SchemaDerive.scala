@@ -92,7 +92,7 @@ object SchemaDerive {
     // Produce one-element RDD for usual processing and multiple-elements for processing with segments
     options.segmentSchema match {
       case None => {
-        val convertResult = SchemaGuruRDD.convertsJsonsToSchema(jsonList, schemaContext)
+        val convertResult = SchemaGuruRDD.convertJsonsToSchema(jsonList, schemaContext)
         val mergeResult = SchemaGuruRDD.mergeAndTransform(convertResult, schemaContext)
         val schema = DerivedSchema(mergeResult.schema, options.selfDescribing)
         val errors = mergeResult.errors.collect.toList  ++ mergeResult.warnings.map(_.consoleMessage)
@@ -103,7 +103,7 @@ object SchemaDerive {
         nameToJsonsMapping map {
           case (key, jsonValidations) => {  // jsons are Lists nested in RDD
             val (mappingErrors, jsons) = splitValidations(jsonValidations.toList)
-            val convertResult = SchemaGuru.convertsJsonsToSchema(jsons, schemaContext)
+            val convertResult = SchemaGuru.convertJsonsToSchema(jsons, schemaContext)
             val mergeResult = SchemaGuru.mergeAndTransform(convertResult, schemaContext)
             val describingInfo = options.selfDescribing.map(_.copy(name = key))
             val fileName = key + ".json"

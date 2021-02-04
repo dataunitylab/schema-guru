@@ -42,7 +42,7 @@ object SchemaGuruRDD extends Serializable {
    * @param context cardinality for detecting possible enums
    * @return result result of converting instances to micro-schemas
    */
-  def convertsJsonsToSchema(jsonList: RDD[ValidJson], context: SchemaContext): JsonConvertResultRDD = {
+  def convertJsonsToSchema(jsonList: RDD[ValidJson], context: SchemaContext): JsonConvertResultRDD = {
 
     val generator = SchemaGenerator(context)
 

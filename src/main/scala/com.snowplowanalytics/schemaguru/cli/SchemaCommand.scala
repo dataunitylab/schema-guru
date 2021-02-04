@@ -143,7 +143,7 @@ case class SchemaCommand private[schemaguru](
    */
   private def produce(name: Option[String], jsons: List[JValue]): SchemaGuruResult = {
     val context = SchemaContext(enumCardinality, successfulEnumSets, Some(jsons.length), !noLength)
-    val convertResult = SchemaGuru.convertsJsonsToSchema(jsons, context)
+    val convertResult = SchemaGuru.convertJsonsToSchema(jsons, context)
     SchemaGuru.mergeAndTransform(convertResult, context)
       .describe(vendor, name, schemaver)
   }
