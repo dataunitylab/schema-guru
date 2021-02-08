@@ -20,7 +20,7 @@ import org.json4s.JsonDSL._
 // This library
 import Helpers.SchemaContext
 
-final case class ObjectProductSchema(objects: List[ObjectSchema])(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithTransform[ObjectProductSchema] {
+final case class ObjectProductSchema(objects: List[ObjectSchema])(implicit val schemaContext: SchemaContext) extends JsonSchema {
   def toJson = ("anyOf" -> objects.map(_.toJson))
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
@@ -34,8 +34,9 @@ final case class ObjectProductSchema(objects: List[ObjectSchema])(implicit val s
 
   def getType = Set("object")
 
-  def transform(f: PartialFunction[JsonSchema, JsonSchema]): ObjectProductSchema = {
-    val objs = objects.map { o => o.transform(f) }
+  override def transform(f: Function1[JsonSchema, JsonSchema]): JsonSchema = {
+    // XXX This assumes ObjectSchema class does not change on transform
+    val objs = objects.map(_.transform(f).asInstanceOf[ObjectSchema])
     this.copy(objects = objs)
   }
 }

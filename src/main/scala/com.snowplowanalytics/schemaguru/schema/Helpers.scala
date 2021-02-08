@@ -184,6 +184,16 @@ object Helpers extends Serializable {
   }
 
   /**
+   * Transformation to flatten object product schemas
+   *
+   * @return transformed schema
+   */
+  def flattenObjectProducts(implicit context: SchemaContext): PartialFunction[JsonSchema, JsonSchema] = {
+    case ObjectProductSchema(objs) => ObjectSchema(objs.map(_.properties).reduce(_ ++ _))
+  }
+
+
+  /**
    * Transformation function for numbers and integers, so that their minimum
    * and maximum values will be encased in Int16-64
    * e.g. {min: 10, max: 1000} is positive Int16,

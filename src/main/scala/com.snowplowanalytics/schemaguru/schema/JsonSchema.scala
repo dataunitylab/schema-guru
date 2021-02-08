@@ -161,5 +161,16 @@ abstract trait JsonSchema {
   def eqOrNone[A](first: Option[A], second: Option[A]): Option[A] =
     if (first == second) first
     else None
+
+  /**
+   * Accept partial function and recursively apply
+   * it to all nested subschemas
+   *
+   * @param f partial function operating on primitive subschemas
+   * @return transformed schema
+   */
+  def transform(f: Function1[JsonSchema, JsonSchema]): JsonSchema = {
+    f(this)
+  }
 }
 

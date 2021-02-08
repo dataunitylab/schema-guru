@@ -30,7 +30,7 @@ import Helpers._
  *
  * @param properties map of keys to subschemas
  */
-final case class ObjectSchema(properties: Map[String, JsonSchema])(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithTransform[ObjectSchema] {
+final case class ObjectSchema(properties: Map[String, JsonSchema])(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
   def toJson = ("type" -> "object") ~ ("properties" -> properties.map {
     case (key, value) => key -> value.toJson
@@ -47,13 +47,8 @@ final case class ObjectSchema(properties: Map[String, JsonSchema])(implicit val 
 
   def getType = Set("object")
 
-  def transform(f: PartialFunction[JsonSchema, JsonSchema]): ObjectSchema = {
-    val props = properties.map {
-      case (k, v) => v match {
-        case complex: SchemaWithTransform[_] => (k, complex.transform(f))
-        case primitive                       => (k, if (f.isDefinedAt(primitive)) f(primitive) else primitive)
-      }
-    }
+  override def transform(f: Function1[JsonSchema, JsonSchema]): JsonSchema = {
+    val props = properties.map { case (k, v) => (k, f(v)) }
     this.copy(properties = props)
   }
 }

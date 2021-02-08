@@ -27,7 +27,7 @@ import Helpers.SchemaContext
  *
  * @param items child schema. Currently doesn't support tuple validation
  */
-final case class ArraySchema(items: JsonSchema)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithTransform[ArraySchema] {
+final case class ArraySchema(items: JsonSchema)(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
   def toJson = ("type" -> "array") ~ ("items" -> items.toJson)
 
@@ -37,11 +37,7 @@ final case class ArraySchema(items: JsonSchema)(implicit val schemaContext: Sche
 
   def getType = Set("array")
 
-  def transform(f: PartialFunction[JsonSchema, JsonSchema]): ArraySchema = {
-    val its = items match {
-      case complex: SchemaWithTransform[_] => complex.transform(f)
-      case primitive                       => if (f.isDefinedAt(primitive)) f(primitive) else primitive
-    }
-    this.copy(its)
+  override def transform(f: Function1[JsonSchema, JsonSchema]): JsonSchema = {
+    this.copy(f(items))
   }
 }

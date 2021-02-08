@@ -24,7 +24,6 @@ import Common.{ JsonConvertResult, DerivedSchema, SchemaGuruResult }
 import generators.{ SchemaGenerator, LevenshteinAnnotator }
 import schema.JsonSchema
 import schema.Helpers._
-import schema.SchemaWithTransform
 
 object SchemaGuru {
   /**
@@ -70,13 +69,10 @@ object SchemaGuru {
 
     val mergedSchema = jsonConvertResult.schemas.suml
 
-    val schema = mergedSchema match {
-      case complex: SchemaWithTransform[_] =>
-        complex.transform { encaseNumericRange }
-               .transform { correctMaxLengths }
-               .transform { substituteEnums(schemaContext) }
-      case _ => mergedSchema
-    }
+    val schema = mergedSchema.transform { encaseNumericRange }
+                             .transform { correctMaxLengths }
+                             .transform { substituteEnums(schemaContext) }
+                             .transform { flattenObjectProducts(schemaContext) }
 
     val duplicates = LevenshteinAnnotator.getDuplicates(extractKeys(schema))
 

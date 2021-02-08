@@ -46,7 +46,7 @@ final case class ProductSchema (
   numberSchema: Option[NumberSchema] = None,
   booleanSchema: Option[BooleanSchema] = None,
   nullSchema: Option[NullSchema] = None
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithTransform[ProductSchema] {
+)(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
   /**
    * List of all subtypes that this product schema really contains
@@ -103,13 +103,17 @@ final case class ProductSchema (
 
   def getType = types.map(_.getType).flatten.toSet
 
-  def transform(f: PartialFunction[JsonSchema, JsonSchema]): ProductSchema =
+  override def transform(f: Function1[JsonSchema, JsonSchema]): JsonSchema =
+    // XXX This assumes that transform will produce something of the same
+    //     type which is currently true for these types but is not enforced
     this.copy(
-      objectSchema.map(_.transform(f)),
-      arraySchema.map(_.transform(f)),
-      stringSchema.map(s => if (f.isDefinedAt(s)) f(s) else s).asInstanceOf[Option[StringSchema]],
-      integerSchema.map(i => if (f.isDefinedAt(i)) f(i) else i).asInstanceOf[Option[IntegerSchema]],
-      numberSchema.map(n => if (f.isDefinedAt(n)) f(n) else n).asInstanceOf[Option[NumberSchema]]
+      objectSchema.map(_.transform(f).asInstanceOf[ObjectSchema]),
+      arraySchema.map(_.transform(f).asInstanceOf[ArraySchema]),
+      stringSchema.map(_.transform(f).asInstanceOf[StringSchema]),
+      integerSchema.map(_.transform(f).asInstanceOf[IntegerSchema]),
+      numberSchema.map(_.transform(f).asInstanceOf[NumberSchema]),
+      booleanSchema.map(_.transform(f).asInstanceOf[BooleanSchema]),
+      nullSchema.map(_.transform(f).asInstanceOf[NullSchema])
     )
 
   override def getJEnum = types.map(_.getJEnum).reduceOption((a, b) => b.merge(a))
