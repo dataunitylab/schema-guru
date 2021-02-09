@@ -71,7 +71,10 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
    */
   private def subJsonToSchema(json: JValue): JsonSchema =
     json match {
-      case JObject(x) => ObjectSchema(jObjectListProcessor(x).toMap)
+      case JObject(x) => {
+        val pairs = jObjectListProcessor(x)
+        ObjectSchema(pairs.toMap, pairs.map(_._1))
+      }
       case JArray(x)  => jArrayListProcessor(x)
       case _          => null // will never happen
     }

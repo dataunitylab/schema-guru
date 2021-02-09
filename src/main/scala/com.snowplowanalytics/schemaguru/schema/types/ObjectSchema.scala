@@ -30,11 +30,18 @@ import Helpers._
  *
  * @param properties map of keys to subschemas
  */
-final case class ObjectSchema(properties: Map[String, JsonSchema])(implicit val schemaContext: SchemaContext) extends JsonSchema {
+final case class ObjectSchema(properties: Map[String, JsonSchema], required: List[String] = List.empty[String])(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
-  def toJson = ("type" -> "object") ~ ("properties" -> properties.map {
-    case (key, value) => key -> value.toJson
-  }) ~ ("additionalProperties" -> false)
+  def toJson = {
+    var json = ("type" -> "object") ~ ("properties" -> properties.map {
+      case (key, value) => key -> value.toJson
+    }) ~ ("additionalProperties" -> false)
+    if (schemaContext.requireFields) {
+      json = json ~ ("required" -> required)
+    }
+
+    json
+  }
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
 
@@ -42,7 +49,7 @@ final case class ObjectSchema(properties: Map[String, JsonSchema])(implicit val 
     implicit val monoid = getMonoid(schemaContext)
 
     // Return partial function
-    { case ObjectSchema(props) => ObjectSchema(properties |+| props) }
+    { case ObjectSchema(props, req) => ObjectSchema(properties |+| props, required.intersect(req)) }
   }
 
   def getType = Set("object")

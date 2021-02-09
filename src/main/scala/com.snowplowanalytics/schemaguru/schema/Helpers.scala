@@ -40,7 +40,7 @@ object Helpers extends Serializable {
    * @param quantity quantity of valid JSON instances to process
    * @param deriveLength flag to disable minLength/maxLength derivation
    */
-  case class SchemaContext(enumCardinality: Int, enumSets: List[JArray] = Nil, quantity: Option[Int] = None, deriveLength: Boolean = true) {
+  case class SchemaContext(enumCardinality: Int, enumSets: List[JArray] = Nil, quantity: Option[Int] = None, deriveLength: Boolean = true, requireFields: Boolean = false) {
     private lazy val sets: List[(Set[JValue], Int)] = enumSets.map { e =>
       val set = e.arr.toSet
       val size = set.size
@@ -91,7 +91,7 @@ object Helpers extends Serializable {
    * @param context schema context with list of predefined sets
    * @return same schema, but with full predefined enum
    */
-  def substituteEnums(implicit context: SchemaContext): PartialFunction[JsonSchema, JsonSchema] = {
+  def substituteEnums(implicit context: SchemaContext): Function1[JsonSchema, JsonSchema] = {
     case s @ StringSchema(_, _, _, _, Some(enum)) => {
       val fullEnum = context.getPredefinedEnum(JArray(enum))
       if (fullEnum.isDefined) { s.copy(enum = fullEnum) } else { s }
@@ -104,6 +104,7 @@ object Helpers extends Serializable {
       val fullEnum = context.getPredefinedEnum(JArray(enum))
       if (fullEnum.isDefined) { n.copy(enum = fullEnum) } else { n }
     }
+    case x => x
   }
 
   /**
@@ -112,7 +113,7 @@ object Helpers extends Serializable {
    *
    * @return same string schema with possibly modified maxLength
    */
-  def correctMaxLengths: PartialFunction[JsonSchema, JsonSchema] = {
+  def correctMaxLengths: Function1[JsonSchema, JsonSchema] = {
     case s @ StringSchema(Some(format), _, _, Some(length), _) => {
       implicit val ctx = s.schemaContext
       format match {
@@ -122,6 +123,7 @@ object Helpers extends Serializable {
         case _      => s
       }
     }
+    case x => x
   }
 
   /**
@@ -131,7 +133,7 @@ object Helpers extends Serializable {
    * @return set of keys
    */
   def extractKeys(schema: JsonSchema): Set[String] = schema match {
-    case ObjectSchema(props) =>
+    case ObjectSchema(props, _) =>
       props.keySet ++ props.flatMap { case (k, v) => extractKeys(v) }
     case ArraySchema(items) =>
       extractKeys(items)
@@ -188,8 +190,9 @@ object Helpers extends Serializable {
    *
    * @return transformed schema
    */
-  def flattenObjectProducts(implicit context: SchemaContext): PartialFunction[JsonSchema, JsonSchema] = {
-    case ObjectProductSchema(objs) => ObjectSchema(objs.map(_.properties).reduce(_ ++ _))
+  def flattenObjectProducts(implicit context: SchemaContext): Function1[JsonSchema, JsonSchema] = {
+    case ObjectProductSchema(objs) => ObjectSchema(objs.map(_.properties).reduce(_ ++ _), objs.map(_.required).reduce(_.intersect(_)))
+    case x => x
   }
 
 
@@ -201,7 +204,7 @@ object Helpers extends Serializable {
    *
    * @return transformed schema
    */
-  def encaseNumericRange: PartialFunction[JsonSchema, JsonSchema] = {
+  def encaseNumericRange: Function1[JsonSchema, JsonSchema] = {
     case int: IntegerSchema => {
       val range = guessRange(int.minimum, int.maximum)
       int.copy(minimum = range.minimum, maximum = range.maximum)(int.schemaContext)
@@ -210,6 +213,7 @@ object Helpers extends Serializable {
       val min = num.minimum.flatMap(x => if (x < 0) None else Some(0.toDouble))
       num.copy(min, None)(num.schemaContext)
     }
+    case x => x
   }
 
   /**
