@@ -24,12 +24,37 @@ final case class ObjectProductSchema(objects: List[ObjectSchema])(implicit val s
   def toJson = ("anyOf" -> objects.map(_.toJson))
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
-    case ObjectProductSchema(otherObjects) => ObjectProductSchema((objects ++ otherObjects).distinct)
-    case obj: ObjectSchema => if (objects.contains(obj)) {
-      this
-    } else {
-      ObjectProductSchema(objects :+ obj)
-    }
+    case ObjectProductSchema(otherObjects) =>
+      if (schemaContext.mergeCommonFields) {
+        otherObjects.foldLeft[JsonSchema](this)(_.merge(_))
+      } else {
+        ObjectProductSchema((objects ++ otherObjects).distinct)
+      }
+
+    case obj: ObjectSchema =>
+      if (objects.contains(obj)) {
+        this
+      } else if (schemaContext.mergeCommonFields) {
+        objects.find(_.properties.keySet.intersect(obj.properties.keySet).size > 0) match {
+          // Merge common properties with this schema
+          case Some(obj2) =>
+            val newProps = (obj.properties.keySet ++ obj2.properties.keys).map { k =>
+              val schema1 = obj.properties.getOrElse(k, ZeroSchema()).asInstanceOf[JsonSchema]
+              val schema2 = obj2.properties.getOrElse(k, ZeroSchema()).asInstanceOf[JsonSchema]
+              k -> schema1.merge(schema2)
+            }.toMap
+
+            val newRequired = obj.required.intersect(obj2.required)
+            val newObj = new ObjectSchema(newProps, newRequired)
+
+            ObjectProductSchema(objects.diff(List(obj2)) :+ newObj)
+
+          // No common properties found, just add the separate schema
+          case None => ObjectProductSchema(objects :+ obj)
+        }
+      } else {
+        ObjectProductSchema(objects :+ obj)
+      }
   }
 
   def getType = Set("object")

@@ -22,6 +22,7 @@ import org.specs2.Specification
 // This library
 import schema.types._
 import schema.Helpers.SchemaContext
+import schema.JsonSchema
 
 class MergeSpec extends Specification { def is = s2"""
   Check integer merge
@@ -35,11 +36,12 @@ class MergeSpec extends Specification { def is = s2"""
     merge strings with maxLengths                          $mergeStringsWithMaxLengths
     merge strings with minLengths                          $mergeStringsWithMinLengths
     merge product types with maxLengths                    $mergeProductTypeWithMaxLengths
+    simplify object product schemas during merge           $simplifyObjectProductSchemas
     """
 
   implicit val formats = DefaultFormats
 
-  implicit val ctx = SchemaContext(0)
+  implicit val ctx = SchemaContext(0, mergeCommonFields = true)
 
   val StringS = StringSchema()
   val IntegerS = IntegerSchema()
@@ -54,6 +56,10 @@ class MergeSpec extends Specification { def is = s2"""
   val schemaWithUuid = ObjectSchema(Map("test_key" -> StringSchema(format = Some("uuid"))))
   val schemaWithDateTime = ObjectSchema(Map("test_key" -> StringSchema(format = Some("date-time"))))
   val schemaWithoutFormat = ObjectSchema(Map("test_key" -> StringSchema()))
+
+  val schemaWithObject = ObjectSchema(Map("foo" -> StringSchema()), List("foo"))
+  val schemaWithOverlappingObject = ObjectSchema(Map("foo" -> StringSchema(), "bar" -> StringSchema()), List("foo", "bar"))
+  val schemaWithDisjointObject = ObjectSchema(Map("baz" -> StringSchema()), List("baz"))
 
   def maintainTypesInArray =
     StringS.merge(IntegerS) must beEqualTo(ProductSchema(stringSchema = Some(StringS), integerSchema = Some(IntegerS)))
@@ -101,5 +107,17 @@ class MergeSpec extends Specification { def is = s2"""
   def mergeProductTypeWithMaxLengths = {
     val merged = IntegerS.merge(StringWithLengths2.merge(StringWithLengths)).toJson
     (merged \ "maxLength").extract[Int] mustEqual(10)
+  }
+
+  def simplifyObjectProductSchemas = {
+    val inputSchemas = List(schemaWithObject, schemaWithOverlappingObject, schemaWithDisjointObject)
+    val merged = inputSchemas.foldLeft[JsonSchema](new ObjectProductSchema(List()))(_.merge(_))
+
+    val expectedSchema = ObjectProductSchema(List(
+      ObjectSchema(Map("foo" -> StringSchema(), "bar" -> StringSchema()), List("foo")),
+      ObjectSchema(Map("baz" -> StringSchema()), List("baz"))
+    ))
+
+    merged mustEqual expectedSchema
   }
 }
