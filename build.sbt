@@ -23,6 +23,14 @@ import SparkjobBuildSettings._
 // Configure prompt to show current project.
 shellPrompt := { s => Project.extract(s).currentProject.id + " > " }
 
+lazy val root = (project in file(".")).
+  enablePlugins(BuildInfoPlugin).
+  settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "com.snowplowanalytics.schemaguru.generated",
+    buildInfoObject := "ProjectSettings"
+  )
+
 // Define our project, with basic project information and library
 // dependencies.
 lazy val project = Project("schema-guru", file("."))
