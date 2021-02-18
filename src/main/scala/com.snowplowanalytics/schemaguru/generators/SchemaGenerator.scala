@@ -100,7 +100,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
           case (k, JInt(v))     => List((k, Annotations.annotateInteger(v)))
           case (k, JDecimal(v)) => List((k, Annotations.annotateNumber(v)))
           case (k, JDouble(v))  => List((k, Annotations.annotateNumber(v)))
-          case (k, JBool(_))    => List((k, BooleanSchema()))
+          case (k, JBool(v))    => List((k, Annotations.annotateBoolean(v)))
           case (k, JNull)       => List((k, NullSchema()))
           case (k, JNothing)    => List((k, NullSchema()))  // should never appear
         }
@@ -130,7 +130,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
           case JInt(v)     => Annotations.annotateInteger(v)
           case JDecimal(v) => Annotations.annotateNumber(v)
           case JDouble(v)  => Annotations.annotateNumber(v)
-          case JBool(_)    => BooleanSchema()
+          case JBool(v)    => Annotations.annotateBoolean(v)
           case JNull       => NullSchema()
           case JNothing    => NullSchema()
         }
@@ -276,6 +276,16 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
      */
     def annotateNumber(value: Double) =
       NumberSchema(value.some, value.some, constructEnum(JDouble(value)))
+
+    /**
+     * Count this value as either true or false
+     */
+    def annotateBoolean(value: Boolean) =
+      if (value) {
+        BooleanSchema(Some(1), Some(0))
+      } else {
+        BooleanSchema(Some(0), Some(1))
+      }
   }
 }
 

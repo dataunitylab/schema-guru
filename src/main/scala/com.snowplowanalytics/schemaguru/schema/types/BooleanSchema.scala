@@ -14,6 +14,10 @@ package com.snowplowanalytics.schemaguru
 package schema
 package types
 
+// scalaz
+import scalaz._
+import Scalaz._
+
 // json4s
 import org.json4s.JsonDSL._
 
@@ -24,13 +28,24 @@ import Helpers.SchemaContext
  * Schema for boolean values
  * http://spacetelescope.github.io/understanding-json-schema/reference/boolean.html
  */
-final case class BooleanSchema(implicit val schemaContext: SchemaContext) extends JsonSchema {
+final case class BooleanSchema(
+  numTrue: Option[BigDecimal] = None,
+  numFalse: Option[BigDecimal] = None
+)(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
   def toJson = ("type" -> "boolean")
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
-    case BooleanSchema() => BooleanSchema()
+    case BooleanSchema(otherTrue, otherFalse) => BooleanSchema(numTrue |+| otherTrue, numFalse |+| otherFalse)
   }
 
   def getType = Set("boolean")
+
+  def truePercentage: Option[Double] = {
+    if (numTrue.isDefined && numFalse.isDefined) {
+      Some((numTrue.get / (numFalse.get + numTrue.get)).toDouble)
+    } else {
+      None
+    }
+  }
 }
