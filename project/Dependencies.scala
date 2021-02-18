@@ -16,8 +16,8 @@ object Dependencies {
 
   val resolutionRepos = Seq(
     // For Snowplow libs
-    "Snowplow Analytics Maven repo" at "http://maven.snplow.com/releases/",
-    "Snowplow Analytics Maven snapshot repo" at "http://maven.snplow.com/snapshots/"
+    "Snowplow Analytics Maven repo" at "https://maven.snplow.com/releases/",
+    "Snowplow Analytics Maven snapshot repo" at "https://maven.snplow.com/snapshots/"
   )
 
   object V {

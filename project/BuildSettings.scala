@@ -26,7 +26,7 @@ object BuildSettings {
     scalacOptions         :=  Seq("-deprecation", "-encoding", "utf8",
                                   "-unchecked", "-feature",
                                   "-Xfatal-warnings", "-target:jvm-1.7"),
-    scalacOptions in Test :=  Seq("-Yrangepos"),
+    Test / scalacOptions  :=  Seq("-Yrangepos"),
     resolvers             ++= Dependencies.resolutionRepos
   )
 
@@ -34,48 +34,33 @@ object BuildSettings {
   lazy val coreSettings = Seq[Setting[_]](
     description           :=  "For deriving JSON Schemas from collections of JSON instances",
 
-    mainClass in (Compile, run) := Some("com.snowplowanalytics.schemaguru.Main")
+    Compile / run / mainClass := Some("com.snowplowanalytics.schemaguru.Main")
   )
 
-  // Makes our SBT app settings available from within the ETL
-  lazy val scalifySettings = Seq(sourceGenerators in Compile <+= (sourceManaged in Compile, version, name, organization, scalaVersion) map { (d, v, n, o, sv) =>
-    val file = d / "settings.scala"
-    IO.write(file, """package com.snowplowanalytics.schemaguru.generated
-                     |object ProjectSettings {
-                     |  val version = "%s"
-                     |  val name = "%s"
-                     |  val organization = "%s"
-                     |  val scalaVersion = "%s"
-                     |}
-                     |""".stripMargin.format(v, n, o, sv))
-    Seq(file)
-  })
-
   // sbt-assembly settings for building a fat jar
-  import sbtassembly.Plugin._
-  import AssemblyKeys._
-  lazy val sbtAssemblyCommonSettings = assemblySettings ++ Seq(
+  import sbtassembly.AssemblyPlugin.autoImport._
+  import sbtassembly.AssemblyPlugin.defaultShellScript
+  lazy val sbtAssemblyCommonSettings = Seq(
     // Executable jarfile
-    assemblyOption in assembly ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
+    assembly / assemblyOption ~= { _.copy(prependShellScript = Some(defaultShellScript)) },
 
     // Name it as an executable
-    jarName in assembly := { s"${name.value}-${version.value}" }
+    assembly / assemblyJarName := { s"${name.value}-${version.value}" }
   )
 
   lazy val sbtAssemblyCoreSettings = sbtAssemblyCommonSettings ++ Seq(
     // Drop these jars
-    excludedJars in assembly <<= (fullClasspath in assembly) map { cp =>
-      val excludes = Set(
-        "commons-beanutils-1.8.3.jar" // Clashes with commons-collections
-      )
-      cp filter { jar => excludes(jar.data.getName) }
+    assembly / assemblyExcludedJars := {
+      val cp = (fullClasspath in assembly).value
+      cp filter { f =>
+        f.data.getName == "commons-beanutils-1.8.3.jar"
+      }
     },
-    mainClass in assembly := Some("com.snowplowanalytics.schemaguru.Main")
+    assembly / mainClass := Some("com.snowplowanalytics.schemaguru.Main")
   )
 
   lazy val coreBuildSettings =
     commonSettings ++
     coreSettings ++
-    scalifySettings ++
     sbtAssemblyCoreSettings
 }

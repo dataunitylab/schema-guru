@@ -23,34 +23,19 @@ object WebuiBuildSettings {
   lazy val webuiSettings = Seq[Setting[_]](
     description           :=  "Web UI and server for Schema Guru",
 
-    mainClass in (Compile, run) := Some("com.snowplowanalytics.schemaguru.webui.Main")
+    Compile / run / mainClass := Some("com.snowplowanalytics.schemaguru.webui.Main")
   )
 
-  // scalifySettings with changed package, since it clashes in assembly
-  lazy val scalifyWebuiSettings = Seq(sourceGenerators in Compile <+= (sourceManaged in Compile, version, name, organization, scalaVersion) map { (d, v, n, o, sv) =>
-    val file = d / "settings.scala"
-    IO.write(file, """package com.snowplowanalytics.schemaguru.webui.generated
-                     |object ProjectSettings {
-                     |  val version = "%s"
-                     |  val name = "%s"
-                     |  val organization = "%s"
-                     |  val scalaVersion = "%s"
-                     |}
-                     |""".stripMargin.format(v, n, o, sv))
-    Seq(file)
-  })
-
-  import sbtassembly.Plugin._
-  import AssemblyKeys._
+  import sbtassembly.AssemblyPlugin.autoImport._
   lazy val sbtAssemblyWebuiSettings = sbtAssemblyCommonSettings ++ Seq(
     // Drop these jars
-    excludedJars in assembly <<= (fullClasspath in assembly) map { cp =>
-      val excludes = Set(
-        "commons-beanutils-1.8.3.jar"
-      )
-      cp filter { jar => excludes(jar.data.getName) }
+    assembly / assemblyExcludedJars := {
+      val cp = (fullClasspath in assembly).value
+      cp filter { f =>
+        f.data.getName == "commons-beanutils-1.8.3.jar"
+      }
     },
-    mainClass in assembly := Some("com.snowplowanalytics.schemaguru.webui.Main")
+    assembly / mainClass := Some("com.snowplowanalytics.schemaguru.webui.Main")
   )
 
   val gulpDeployTask = TaskKey[Unit]("gulpDeploy", "Build Web UI")
@@ -63,6 +48,5 @@ object WebuiBuildSettings {
     commonSettings ++
     webuiSettings ++
     gulpDeploySettings ++
-    scalifyWebuiSettings ++
     sbtAssemblyWebuiSettings
 }
