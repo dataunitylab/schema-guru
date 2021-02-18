@@ -19,6 +19,6 @@ object Main extends App {
 
   parser.parse(args, CommandContainer(None)).flatMap(_.command) match {
     case Some(command: SchemaCommand) => command.processSchema()
-    case _                     	      => parser.showUsageAsError()
+    case _                     	      =>
   }
 }

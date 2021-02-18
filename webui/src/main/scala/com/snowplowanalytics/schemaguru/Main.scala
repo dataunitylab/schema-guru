@@ -48,7 +48,7 @@ object Main extends App {
 
   config match {
     case Some(options) => run(options)
-    case None => WebuiCli.parser.showUsageAsError()
+    case _ =>
   }
 
   def run(options: WebuiCli.Config): Unit = {

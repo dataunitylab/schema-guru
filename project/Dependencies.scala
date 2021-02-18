@@ -22,13 +22,13 @@ object Dependencies {
 
   object V {
     // Java
-    val yodaTime         = "2.10.5"
+    val yodaTime         = "2.10.10"
     val yodaConvert      = "2.2.1"
-    val jacksonDatabind  = "2.5.4"
+    val jacksonDatabind  = "2.12.1"
     val jsonValidator    = "2.2.7"
-    val commonsValidator = "1.6"
+    val commonsValidator = "1.7"
     // Scala
-    val scopt            = "3.7.1"
+    val scopt            = "4.0.0"
     val scalaz7          = "7.0.8"
     val json4s           = "3.2.10"   // don't upgrade to 3.2.11 https://github.com/json4s/json4s/issues/212
     val jsonpath         = "0.6.10"
