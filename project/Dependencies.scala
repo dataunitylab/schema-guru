@@ -61,7 +61,7 @@ object Dependencies {
     val sprayCan         = "io.spray"                   %% "spray-can"                 % V.spray
     val sprayRouting     = "io.spray"                   %% "spray-routing"             % V.spray
     // Spark
-    val sparkCore        = "org.apache.spark"           %% "spark-core"                % V.spark          % "provided"
+    val sparkCore        = "org.apache.spark"           %% "spark-core"                % V.spark
     // Scala (test only)
     val specs2           = "org.specs2"                 %% "specs2"                    % V.specs2         % "test"
     val scalazSpecs2     = "org.typelevel"              %% "scalaz-specs2"             % V.scalazSpecs2   % "test"

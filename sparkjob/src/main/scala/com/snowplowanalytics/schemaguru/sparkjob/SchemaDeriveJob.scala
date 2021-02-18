@@ -20,9 +20,8 @@ object SchemaDeriveJob {
 
     // Run the word count
     SchemaDerive.execute(
-      master = None,
-      args   = args.toList,
-      jars   = List(SparkContext.jarOfObject(this).get)
+      master = Some("local"),
+      args   = args.toList
     )
 
     // Exit with success
