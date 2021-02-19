@@ -63,9 +63,9 @@ object Dependencies {
     // Spark
     val sparkCore        = "org.apache.spark"           %% "spark-core"                % V.spark
     // Scala (test only)
-    val specs2           = "org.specs2"                 %% "specs2"                    % V.specs2         % "test"
-    val scalazSpecs2     = "org.typelevel"              %% "scalaz-specs2"             % V.scalazSpecs2   % "test"
-    val scalaCheck       = "org.scalacheck"             %% "scalacheck"                % V.scalaCheck     % "test"
-    val sprayTestkit     = "io.spray"                   %% "spray-testkit"             % V.spray          % "test"
+    val specs2           = "org.specs2"                 %% "specs2"                    % V.specs2         % Test
+    val scalazSpecs2     = "org.typelevel"              %% "scalaz-specs2"             % V.scalazSpecs2   % Test
+    val scalaCheck       = "org.scalacheck"             %% "scalacheck"                % V.scalaCheck     % Test
+    val sprayTestkit     = "io.spray"                   %% "spray-testkit"             % V.spray          % Test
   }
 }
