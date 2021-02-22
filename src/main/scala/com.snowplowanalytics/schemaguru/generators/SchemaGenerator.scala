@@ -261,21 +261,21 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
      * Add itself to enum array
      */
     def annotateInteger(value: BigInt) =
-      IntegerSchema(Some(value.toLong), Some(value.toLong), constructEnum(JInt(value)))
+      IntegerSchema(Some(value.toLong), Some(value.toLong), constructEnum(JInt(value)), List((value.toFloat, 1)))
 
     /**
      * Set value itself as minimum. We haven't maximum bounds for numbers
      * Add itself to enum array
      */
     def annotateNumber(value: BigDecimal) =
-      NumberSchema(value.toDouble.some, value.toDouble.some, constructEnum(JDouble(value.toDouble)))
+      NumberSchema(value.toDouble.some, value.toDouble.some, constructEnum(JDouble(value.toDouble)), List((value.toFloat, 1)))
 
     /**
      * Set value itself as minimum. We haven't maximum bounds for numbers
      * Add itself to enum array
      */
     def annotateNumber(value: Double) =
-      NumberSchema(value.some, value.some, constructEnum(JDouble(value)))
+      NumberSchema(value.some, value.some, constructEnum(JDouble(value)), List((value.toFloat, 1)))
 
     /**
      * Count this value as either true or false

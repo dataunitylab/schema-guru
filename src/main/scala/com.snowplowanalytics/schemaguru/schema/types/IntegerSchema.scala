@@ -32,19 +32,22 @@ import Helpers.SchemaContext
  * @param minimum minimum bound
  * @param maximum maximum bound
  * @param enum set of all acceptable values
+ * @param bins histogram of values
  */
 final case class IntegerSchema(
   minimum: Option[BigInt] = None,
   maximum: Option[BigInt] = None,
-  enum: Option[List[JValue]] = Some(Nil)
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum {
+  enum: Option[List[JValue]] = Some(Nil),
+  bins: List[(Float, Int)] = List.empty[(Float, Int)]
+)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram {
 
   def toJson = ("type" -> "integer") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum)
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
-    case IntegerSchema(min, max, otherEnum) => {
+    case IntegerSchema(min, max, otherEnum, otherBins) => {
       val mergedEnums = mergeEnums(otherEnum)
-      IntegerSchema(minOrNone(min, minimum), maxOrNone(max, maximum), mergedEnums)
+      val mergedBins = mergeBins(otherBins)
+      IntegerSchema(minOrNone(min, minimum), maxOrNone(max, maximum), mergedEnums, mergedBins)
     }
     case num: NumberSchema => num.merge(this)
   }

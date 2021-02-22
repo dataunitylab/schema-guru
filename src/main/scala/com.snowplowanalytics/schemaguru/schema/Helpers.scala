@@ -101,11 +101,11 @@ object Helpers extends Serializable {
       val fullEnum = context.getPredefinedEnum(JArray(enum))
       if (fullEnum.isDefined) { s.copy(enum = fullEnum) } else { s }
     }
-    case i @ IntegerSchema(_, _, Some(enum)) => {
+    case i @ IntegerSchema(_, _, Some(enum), _) => {
       val fullEnum = context.getPredefinedEnum(JArray(enum))
       if (fullEnum.isDefined) { i.copy(enum = fullEnum) } else { i }
     }
-    case n @ NumberSchema(_, _, Some(enum)) => {
+    case n @ NumberSchema(_, _, Some(enum), _) => {
       val fullEnum = context.getPredefinedEnum(JArray(enum))
       if (fullEnum.isDefined) { n.copy(enum = fullEnum) } else { n }
     }
