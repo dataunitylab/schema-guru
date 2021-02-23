@@ -40,19 +40,24 @@ final case class StringSchema(
   minLength: Option[Int] = None,
   maxLength: Option[Int] = None,
   enum: Option[List[JValue]] = Some(Nil)
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum {
+)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHLL {
 
   def toJson = ("type" -> "string") ~ ("format" -> format) ~ ("pattern" -> pattern) ~ ("minLength" -> minLength) ~ ("maxLength" -> maxLength) ~ ("enum" -> getJEnum)
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
-    case StringSchema(otherFormat, otherPattern, otherMinLength, otherMaxLength, otherEnum) => {
-      StringSchema(
+    case other @ StringSchema(otherFormat, otherPattern, otherMinLength, otherMaxLength, otherEnum) => {
+      val newSchema = StringSchema(
         eqOrNone(otherFormat, format),
         eqOrNone(otherPattern, pattern),
         minOrNone(otherMinLength, minLength),
         maxOrNone(otherMaxLength, maxLength),
         mergeEnums(otherEnum)
       )
+
+      newSchema.hll.merge(hll)
+      newSchema.hll.merge(other.hll)
+
+      newSchema
     }
   }
 

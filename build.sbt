@@ -45,6 +45,7 @@ lazy val project = Project("schema-guru", file("."))
       Libraries.commonsValidator,
       // Scala
       Libraries.scalaz7,
+      Libraries.hyperLogLog,
       Libraries.json4sJackson,
       Libraries.json4sScalaz,
       Libraries.jsonpath,

@@ -247,35 +247,49 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
      * Adds properties to string field
      */
     def annotateString(value: String): StringSchema = {
-      StringSchema(
+       val schema = StringSchema(
         suggestAnnotation(value, formatSuggestions),
         suggestAnnotation(value, patternSuggestions),
         minLength = if (context.deriveLength) Some(value.length) else None,
         maxLength = if (context.deriveLength) Some(value.length) else None,
-        enum = constructEnum(JString(value))
-      )
+        enum = constructEnum(JString(value)))
+       schema.hll.addString(value)
+
+       schema
     }
 
     /**
      * Set value itself as minimum and maximum for future merge and reduce
      * Add itself to enum array
      */
-    def annotateInteger(value: BigInt) =
-      IntegerSchema(Some(value.toLong), Some(value.toLong), constructEnum(JInt(value)), List((value.toFloat, 1)))
+    def annotateInteger(value: BigInt) = {
+      val schema = IntegerSchema(Some(value.toLong), Some(value.toLong), constructEnum(JInt(value)), List((value.toFloat, 1)))
+      schema.hll.addLong(value.toLong)
+
+      schema
+    }
 
     /**
      * Set value itself as minimum. We haven't maximum bounds for numbers
      * Add itself to enum array
      */
-    def annotateNumber(value: BigDecimal) =
-      NumberSchema(value.toDouble.some, value.toDouble.some, constructEnum(JDouble(value.toDouble)), List((value.toFloat, 1)))
+    def annotateNumber(value: BigDecimal) = {
+      val schema = NumberSchema(value.toDouble.some, value.toDouble.some, constructEnum(JDouble(value.toDouble)), List((value.toFloat, 1)))
+      schema.hll.addDouble(value.toDouble)
+
+      schema
+    }
 
     /**
      * Set value itself as minimum. We haven't maximum bounds for numbers
      * Add itself to enum array
      */
-    def annotateNumber(value: Double) =
-      NumberSchema(value.some, value.some, constructEnum(JDouble(value)), List((value.toFloat, 1)))
+    def annotateNumber(value: Double) = {
+      val schema = NumberSchema(value.some, value.some, constructEnum(JDouble(value)), List((value.toFloat, 1)))
+      schema.hll.addDouble(value)
+
+      schema
+    }
 
     /**
      * Count this value as either true or false

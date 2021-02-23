@@ -39,15 +39,20 @@ final case class IntegerSchema(
   maximum: Option[BigInt] = None,
   enum: Option[List[JValue]] = Some(Nil),
   bins: List[(Float, Int)] = List.empty[(Float, Int)]
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram {
+)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram with SchemaWithHLL {
 
   def toJson = ("type" -> "integer") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum)
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
-    case IntegerSchema(min, max, otherEnum, otherBins) => {
+    case other @ IntegerSchema(min, max, otherEnum, otherBins) => {
       val mergedEnums = mergeEnums(otherEnum)
       val mergedBins = mergeBins(otherBins)
-      IntegerSchema(minOrNone(min, minimum), maxOrNone(max, maximum), mergedEnums, mergedBins)
+      val newSchema = IntegerSchema(minOrNone(min, minimum), maxOrNone(max, maximum), mergedEnums, mergedBins)
+
+      newSchema.hll.merge(hll)
+      newSchema.hll.merge(other.hll)
+
+      newSchema
     }
     case num: NumberSchema => num.merge(this)
   }

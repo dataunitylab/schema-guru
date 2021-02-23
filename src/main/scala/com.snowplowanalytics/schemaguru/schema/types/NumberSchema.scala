@@ -39,7 +39,7 @@ final case class NumberSchema(
   maximum: Option[Double] = None,
   enum: Option[List[JValue]] = Some(Nil),
   bins: List[(Float, Int)] = List.empty[(Float, Int)]
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram {
+)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram with SchemaWithHLL {
 
   def toJson = {
     val json = ("type" -> "number") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum) transformField {
@@ -49,20 +49,30 @@ final case class NumberSchema(
   }
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
-    case NumberSchema(min, max, otherEnum, otherBins) => {
+    case other @ NumberSchema(min, max, otherEnum, otherBins) => {
       val mergedEnums = mergeEnums(otherEnum)
       val mergedBins = mergeBins(otherBins)
-      NumberSchema(minOrNone(min, minimum), maxOrNone(max, maximum), mergedEnums, mergedBins)
+      val newSchema = NumberSchema(minOrNone(min, minimum), maxOrNone(max, maximum), mergedEnums, mergedBins)
+
+      newSchema.hll.merge(hll)
+      newSchema.hll.merge(other.hll)
+
+      newSchema
     }
-    case IntegerSchema(min, max, otherEnum, otherBins) => {
+    case other @ IntegerSchema(min, max, otherEnum, otherBins) => {
       val mergedEnums = mergeEnums(otherEnum)
       val mergedBins = mergeBins(otherBins)
-      NumberSchema(
+      val newSchema = NumberSchema(
         (min.map(_.toDouble) |@| minimum) { math.min },
         (max.map(_.toDouble) |@| maximum) { math.max },
         mergedEnums,
         mergedBins
       )
+
+      newSchema.hll.merge(hll)
+      newSchema.hll.merge(other.hll)
+
+      newSchema
     }
   }
 

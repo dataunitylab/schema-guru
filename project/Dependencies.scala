@@ -18,6 +18,7 @@ object Dependencies {
     // Java
     val yodaTime         = "2.10.10"
     val yodaConvert      = "2.2.1"
+    val hyperLogLog      = "1.1"
     val jacksonDatabind  = "2.12.1"
     val jsonValidator    = "2.2.7"
     val commonsValidator = "1.7"
@@ -40,6 +41,7 @@ object Dependencies {
     // Java
     val yodaTime         = "joda-time"                  %  "joda-time"                 % V.yodaTime
     val yodaConvert      = "org.joda"                   %  "joda-convert"              % V.yodaConvert
+    val hyperLogLog      = "com.github.prasanthj"       % "hyperloglog"                % V.hyperLogLog
     val jacksonDatabind  = "com.fasterxml.jackson.core" %  "jackson-databind"          % V.jacksonDatabind
     val jsonValidator    = "com.github.java-json-tools" %  "json-schema-validator"     % V.jsonValidator
     val commonsValidator = "commons-validator"          %  "commons-validator"         % V.commonsValidator
