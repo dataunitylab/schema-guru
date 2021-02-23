@@ -41,7 +41,7 @@ final case class IntegerSchema(
   bins: List[(Float, Int)] = List.empty[(Float, Int)]
 )(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram with SchemaWithHLL {
 
-  def toJson = ("type" -> "integer") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum)
+  def toJson = ("type" -> "integer") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum) ~ ("distinctValues" -> hll.count)
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
     case other @ IntegerSchema(min, max, otherEnum, otherBins) => {
