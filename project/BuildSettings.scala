@@ -26,8 +26,7 @@ object BuildSettings {
     scalacOptions         :=  Seq("-deprecation", "-encoding", "utf8",
                                   "-unchecked", "-feature",
                                   "-Xfatal-warnings", "-target:jvm-1.7"),
-    Test / scalacOptions  :=  Seq("-Yrangepos"),
-    resolvers             ++= Dependencies.resolutionRepos
+    Test / scalacOptions  :=  Seq("-Yrangepos")
   )
 
   // Settings specific for Schema Guru CLI
