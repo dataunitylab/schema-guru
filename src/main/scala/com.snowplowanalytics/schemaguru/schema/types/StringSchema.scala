@@ -40,7 +40,7 @@ final case class StringSchema(
   minLength: Option[Int] = None,
   maxLength: Option[Int] = None,
   enum: Option[List[JValue]] = Some(Nil)
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHLL {
+)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHLL with SchemaWithSamples[String] {
 
   def toJson = ("type" -> "string") ~
                ("format" -> format) ~
@@ -62,6 +62,7 @@ final case class StringSchema(
 
       newSchema.hll.merge(hll)
       newSchema.hll.merge(other.hll)
+      newSchema.mergeSamples(samples, totalSamples, other.samples, other.totalSamples)
 
       newSchema
     }

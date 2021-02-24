@@ -254,6 +254,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
         maxLength = if (context.deriveLength) Some(value.length) else None,
         enum = constructEnum(JString(value)))
        schema.hll.addString(value)
+      schema.addSample(value)
 
        schema
     }
@@ -265,6 +266,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
     def annotateInteger(value: BigInt) = {
       val schema = IntegerSchema(Some(value.toLong), Some(value.toLong), constructEnum(JInt(value)), List((value.toFloat, 1)))
       schema.hll.addLong(value.toLong)
+      schema.addSample(value)
 
       schema
     }
@@ -276,6 +278,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
     def annotateNumber(value: BigDecimal) = {
       val schema = NumberSchema(value.toDouble.some, value.toDouble.some, constructEnum(JDouble(value.toDouble)), List((value.toFloat, 1)))
       schema.hll.addDouble(value.toDouble)
+      schema.addSample(value.toDouble)
 
       schema
     }
@@ -287,6 +290,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
     def annotateNumber(value: Double) = {
       val schema = NumberSchema(value.some, value.some, constructEnum(JDouble(value)), List((value.toFloat, 1)))
       schema.hll.addDouble(value)
+      schema.addSample(value)
 
       schema
     }

@@ -39,7 +39,7 @@ final case class NumberSchema(
   maximum: Option[Double] = None,
   enum: Option[List[JValue]] = Some(Nil),
   bins: List[(Float, Int)] = List.empty[(Float, Int)]
-)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram with SchemaWithHLL {
+)(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram with SchemaWithHLL with SchemaWithSamples[Double] {
 
   def toJson = {
     val json = ("type" -> "number") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum) ~ ("distinctValues" -> hll.count) transformField {
@@ -56,6 +56,7 @@ final case class NumberSchema(
 
       newSchema.hll.merge(hll)
       newSchema.hll.merge(other.hll)
+      newSchema.mergeSamples(samples, totalSamples, other.samples, other.totalSamples)
 
       newSchema
     }
@@ -71,6 +72,7 @@ final case class NumberSchema(
 
       newSchema.hll.merge(hll)
       newSchema.hll.merge(other.hll)
+      newSchema.mergeSamples(samples, totalSamples, other.samples.map(_.toDouble), other.totalSamples)
 
       newSchema
     }
