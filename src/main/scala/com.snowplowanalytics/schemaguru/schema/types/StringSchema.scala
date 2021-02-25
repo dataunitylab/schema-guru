@@ -48,7 +48,8 @@ final case class StringSchema(
                ("minLength" -> minLength) ~
                ("maxLength" -> maxLength) ~
                ("enum" -> getJEnum) ~
-               ("distinctValues" -> hll.count)
+               ("distinctValues" -> hll.count) ~
+               ("samples" -> samples.distinct)
 
   def mergeSameType(implicit schemaContext: SchemaContext) = {
     case other @ StringSchema(otherFormat, otherPattern, otherMinLength, otherMaxLength, otherEnum) => {

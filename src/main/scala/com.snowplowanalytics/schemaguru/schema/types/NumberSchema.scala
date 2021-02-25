@@ -42,9 +42,15 @@ final case class NumberSchema(
 )(implicit val schemaContext: SchemaContext) extends JsonSchema with SchemaWithEnum with SchemaWithHistogram with SchemaWithHLL with SchemaWithSamples[Double] {
 
   def toJson = {
-    val json = ("type" -> "number") ~ ("maximum" -> maximum) ~ ("minimum" -> minimum) ~ ("enum" -> getJEnum) ~ ("distinctValues" -> hll.count) transformField {
-      case ("minimum", JDouble(0.0)) => ("minimum" -> 0)
-    }
+    val json = ("type" -> "number") ~
+               ("maximum" -> maximum) ~
+               ("minimum" -> minimum) ~
+               ("enum" -> getJEnum) ~
+               ("distinctValues" -> hll.count) ~
+               ("samples" -> samples.distinct) ~
+               ("histogram" -> bins.map(t => List(t._1, t._2))) transformField {
+                 case ("minimum", JDouble(0.0)) => ("minimum" -> 0)
+               }
     json.asInstanceOf[JObject]
   }
 
