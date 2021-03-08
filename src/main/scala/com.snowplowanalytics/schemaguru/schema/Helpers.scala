@@ -121,12 +121,16 @@ object Helpers extends Serializable {
   def correctMaxLengths: Function1[JsonSchema, JsonSchema] = {
     case s @ StringSchema(Some(format), _, _, Some(length), _) => {
       implicit val ctx = s.schemaContext
-      format match {
+      val newSchema = format match {
         case "ipv4" => s.copy(maxLength = Some(15))
         case "ipv6" => s.copy(maxLength = Some(39))
         case "uri"  => s.copy(maxLength = Some(8192))
         case _      => s
       }
+      newSchema.samples = s.samples
+      newSchema.hll.merge(s.hll)
+
+      newSchema
     }
     case x => x
   }
