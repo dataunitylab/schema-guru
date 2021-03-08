@@ -267,6 +267,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
       val schema = IntegerSchema(Some(value.toLong), Some(value.toLong), constructEnum(JInt(value)), List((value.toFloat, 1)))
       schema.hll.addLong(value.toLong)
       schema.addSample(value)
+      schema.initializeStats(value.toLong)
 
       schema
     }
@@ -279,6 +280,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
       val schema = NumberSchema(value.toDouble.some, value.toDouble.some, constructEnum(JDouble(value.toDouble)), List((value.toFloat, 1)))
       schema.hll.addDouble(value.toDouble)
       schema.addSample(value.toDouble)
+      schema.initializeStats(value.toDouble)
 
       schema
     }
@@ -291,6 +293,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
       val schema = NumberSchema(value.some, value.some, constructEnum(JDouble(value)), List((value.toFloat, 1)))
       schema.hll.addDouble(value)
       schema.addSample(value)
+      schema.initializeStats(value)
 
       schema
     }
