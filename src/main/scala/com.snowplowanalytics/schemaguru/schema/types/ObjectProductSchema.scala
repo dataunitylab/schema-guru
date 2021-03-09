@@ -14,6 +14,10 @@ package com.snowplowanalytics.schemaguru
 package schema
 package types
 
+// Scalaz
+import scalaz._
+import Scalaz._
+
 // json4s
 import org.json4s.JsonDSL._
 
@@ -44,8 +48,9 @@ final case class ObjectProductSchema(objects: List[ObjectSchema])(implicit val s
               k -> schema1.merge(schema2)
             }.toMap
 
+            val newPropCounts = obj.propertyCounts |+| obj2.propertyCounts
             val newRequired = obj.required.intersect(obj2.required)
-            val newObj = new ObjectSchema(newProps, newRequired)
+            val newObj = new ObjectSchema(newProps, newRequired, newPropCounts, obj.totalCount + obj2.totalCount)
 
             ObjectProductSchema(objects.diff(List(obj2)) :+ newObj)
 

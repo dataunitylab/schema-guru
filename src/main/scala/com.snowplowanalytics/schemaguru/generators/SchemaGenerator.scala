@@ -73,7 +73,7 @@ class SchemaGenerator(implicit val context: SchemaContext) extends Serializable 
     json match {
       case JObject(x) => {
         val pairs = jObjectListProcessor(x)
-        ObjectSchema(pairs.toMap, pairs.map(_._1))
+        ObjectSchema(pairs.toMap, pairs.map(_._1), pairs.map { case (key, _) => (key, 1) }.toMap, 1)
       }
       case JArray(x)  => jArrayListProcessor(x)
       case _          => null // will never happen

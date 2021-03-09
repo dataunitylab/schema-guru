@@ -30,11 +30,13 @@ import Helpers._
  *
  * @param properties map of keys to subschemas
  */
-final case class ObjectSchema(properties: Map[String, JsonSchema], required: List[String] = List.empty[String])(implicit val schemaContext: SchemaContext) extends JsonSchema {
+final case class ObjectSchema(properties: Map[String, JsonSchema], required: List[String] = List.empty[String], propertyCounts: Map[String, Int], totalCount: Int)(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
   def toJson = {
     var json = ("type" -> "object") ~ ("properties" -> properties.map {
       case (key, value) => key -> value.toJson
+    }) ~ ("propertyRatios" -> propertyCounts.map {
+      case (key, value) => key -> value * 1.0 / totalCount
     }) ~ ("additionalProperties" -> false)
     if (schemaContext.requireFields) {
       json = json ~ ("required" -> required)
@@ -49,7 +51,7 @@ final case class ObjectSchema(properties: Map[String, JsonSchema], required: Lis
     implicit val monoid = getMonoid(schemaContext)
 
     // Return partial function
-    { case ObjectSchema(props, req) => ObjectSchema(properties |+| props, required.intersect(req)) }
+    { case ObjectSchema(props, req, propCounts, totCount) => ObjectSchema(properties |+| props, required.intersect(req), propertyCounts |+| propCounts, totCount + totalCount) }
   }
 
   def getType = Set("object")

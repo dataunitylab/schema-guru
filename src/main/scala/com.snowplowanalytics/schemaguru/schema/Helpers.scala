@@ -142,7 +142,7 @@ object Helpers extends Serializable {
    * @return set of keys
    */
   def extractKeys(schema: JsonSchema): Set[String] = schema match {
-    case ObjectSchema(props, _) =>
+    case ObjectSchema(props, _, _, _) =>
       props.keySet ++ props.flatMap { case (k, v) => extractKeys(v) }
     case ArraySchema(items) =>
       extractKeys(items)
@@ -200,7 +200,7 @@ object Helpers extends Serializable {
    * @return transformed schema
    */
   def flattenObjectProducts(implicit context: SchemaContext): Function1[JsonSchema, JsonSchema] = {
-    case ObjectProductSchema(objs) => ObjectSchema(objs.map(_.properties).reduce(_ ++ _), objs.map(_.required).reduce(_.intersect(_)))
+    case ObjectProductSchema(objs) => ObjectSchema(objs.map(_.properties).reduce(_ ++ _), objs.map(_.required).reduce(_.intersect(_)), objs.map(_.propertyCounts).reduce(_ |+| _), objs.map(_.totalCount).sum)
     case x => x
   }
 
