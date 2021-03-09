@@ -49,20 +49,20 @@ class MergeSpec extends Specification { def is = s2"""
   val StringWithLengths = StringSchema(minLength = Some(3), maxLength = Some(10))
   val StringWithLengths2 = StringSchema(minLength = Some(5), maxLength = Some(8))
 
-  val schemaWithInt16 = ObjectSchema(Map("test_key" -> IntegerSchema(Some(-2), Some(3))))
-  val schemaWithInt32 = ObjectSchema(Map("test_key" -> IntegerSchema(Some(-34000), Some(3))))
-  val schemaWithNumber = ObjectSchema(Map("test_key" -> NumberSchema(Some(-34000), Some(3.3))))
+  val schemaWithInt16 = ObjectSchema(Map("test_key" -> IntegerSchema(Some(-2), Some(3))), List(), Map("test_key" -> 1), 1)
+  val schemaWithInt32 = ObjectSchema(Map("test_key" -> IntegerSchema(Some(-34000), Some(3))), List(), Map("test_key" -> 1), 1)
+  val schemaWithNumber = ObjectSchema(Map("test_key" -> NumberSchema(Some(-34000), Some(3.3))), List(), Map("test_key" -> 1), 1)
 
-  val schemaWithUuid = ObjectSchema(Map("test_key" -> StringSchema(format = Some("uuid"))))
-  val schemaWithDateTime = ObjectSchema(Map("test_key" -> StringSchema(format = Some("date-time"))))
-  val schemaWithoutFormat = ObjectSchema(Map("test_key" -> StringSchema()))
+  val schemaWithUuid = ObjectSchema(Map("test_key" -> StringSchema(format = Some("uuid"))), List(), Map("test_key" -> 1), 1)
+  val schemaWithDateTime = ObjectSchema(Map("test_key" -> StringSchema(format = Some("date-time"))), List(), Map("test_key" -> 1), 1)
+  val schemaWithoutFormat = ObjectSchema(Map("test_key" -> StringSchema()), List(), Map("test_key" -> 1), 1)
 
-  val schemaWithObject = ObjectSchema(Map("foo" -> StringSchema()), List("foo"))
-  val schemaWithOverlappingObject = ObjectSchema(Map("foo" -> StringSchema(), "bar" -> StringSchema()), List("foo", "bar"))
-  val schemaWithDisjointObject = ObjectSchema(Map("baz" -> StringSchema()), List("baz"))
+  val schemaWithObject = ObjectSchema(Map("foo" -> StringSchema()), List("foo"), Map("foo" -> 1), 1)
+  val schemaWithOverlappingObject = ObjectSchema(Map("foo" -> StringSchema(), "bar" -> StringSchema()), List("foo", "bar"), Map("foo" -> 1), 1)
+  val schemaWithDisjointObject = ObjectSchema(Map("baz" -> StringSchema()), List("baz"), Map("baz" -> 1), 1)
 
   def maintainTypesInArray =
-    StringS.merge(IntegerS) must beEqualTo(ProductSchema(stringSchema = Some(StringS), integerSchema = Some(IntegerS)))
+    StringS.merge(IntegerS) must beEqualTo(ProductSchema(stringSchema = Some(StringS), stringSchemaCount = 1, integerSchema = Some(IntegerS), numberSchemaCount = 1, totalCount = 2))
 
   def mergeMinimumValuesForInt32 = {
     val merged = schemaWithInt16.merge(schemaWithInt32).toJson
@@ -114,8 +114,8 @@ class MergeSpec extends Specification { def is = s2"""
     val merged = inputSchemas.foldLeft[JsonSchema](new ObjectProductSchema(List()))(_.merge(_))
 
     val expectedSchema = ObjectProductSchema(List(
-      ObjectSchema(Map("foo" -> StringSchema(), "bar" -> StringSchema()), List("foo")),
-      ObjectSchema(Map("baz" -> StringSchema()), List("baz"))
+      ObjectSchema(Map("foo" -> StringSchema(), "bar" -> StringSchema()), List("foo"), Map("foo" -> 2), 2),
+      ObjectSchema(Map("baz" -> StringSchema()), List("baz"), Map("baz" -> 1), 1)
     ))
 
     merged mustEqual expectedSchema
