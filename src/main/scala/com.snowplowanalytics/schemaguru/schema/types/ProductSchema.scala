@@ -40,12 +40,19 @@ import Helpers.SchemaContext
  */
 final case class ProductSchema (
   objectSchema: Option[ObjectSchema] = None,
+  objectSchemaCount: Int = 0,
   arraySchema: Option[ArraySchema] = None,
+  arraySchemaCount: Int = 0,
   stringSchema: Option[StringSchema] = None,
+  stringSchemaCount: Int = 0,
   integerSchema: Option[IntegerSchema] = None,
   numberSchema: Option[NumberSchema] = None,
+  numberSchemaCount: Int = 0,
   booleanSchema: Option[BooleanSchema] = None,
-  nullSchema: Option[NullSchema] = None
+  booleanSchemaCount: Int = 0,
+  nullSchema: Option[NullSchema] = None,
+  nullSchemaCount: Int = 0,
+  totalCount: Int = 0
 )(implicit val schemaContext: SchemaContext) extends JsonSchema {
 
   /**
@@ -63,17 +70,30 @@ final case class ProductSchema (
       // everything afterwards overrides previous values
       .merge(("type" -> getType): JObject)
       .transformField { case ("enum", _) => ("enum" -> getJEnum) }
-      .asInstanceOf[JObject]
+      .asInstanceOf[JObject] ~
+    ("typeRatios" -> ("object" -> objectSchemaCount * 1.0 / totalCount) ~
+                     ("array" -> arraySchemaCount * 1.0 / totalCount) ~
+                     ("string" -> stringSchemaCount * 1.0 / totalCount) ~
+                     ("number" -> numberSchemaCount * 1.0 / totalCount) ~
+                     ("boolean" -> booleanSchemaCount * 1.0 / totalCount) ~
+                     ("null" -> nullSchemaCount * 1.0 / totalCount))
 
   def mergeSameType(implicit schemaContext: SchemaContext): PartialFunction[JsonSchema, ProductSchema] = {
-    case ProductSchema(obj, arr, str, int, num, bool, nul) => ProductSchema(
+    case ProductSchema(obj, objCount, arr, arrCount, str, strCount, int, num, numCount, bool, boolCount, nul, nulCount, totCount) => ProductSchema(
       mergeWithOption(obj, this.objectSchema).asInstanceOf[Option[ObjectSchema]],
+      objCount + objectSchemaCount,
       mergeWithOption(arr, this.arraySchema).asInstanceOf[Option[ArraySchema]],
+      arrCount + arraySchemaCount,
       mergeWithOption(str, this.stringSchema).asInstanceOf[Option[StringSchema]],
+      strCount + stringSchemaCount,
       mergeInteger(int),
       mergeInteger(num, int),
+      numCount + numberSchemaCount,
       mergeWithOption(bool,this.booleanSchema).asInstanceOf[Option[BooleanSchema]],
-      mergeWithOption(nul, this.nullSchema).asInstanceOf[Option[NullSchema]]
+      boolCount + booleanSchemaCount,
+      mergeWithOption(nul, this.nullSchema).asInstanceOf[Option[NullSchema]],
+      nulCount + nullSchemaCount,
+      totCount + totalCount
     )
   }
 
@@ -81,22 +101,22 @@ final case class ProductSchema (
     case prod: ProductSchema =>
       this.mergeSameType(schemaContext)(other)
     case obj: ObjectSchema =>
-      this.copy(objectSchema = obj.merge(this.objectSchema).asInstanceOf[ObjectSchema].some)
+      this.copy(objectSchema = obj.merge(this.objectSchema).asInstanceOf[ObjectSchema].some, objectSchemaCount = objectSchemaCount + 1, totalCount = totalCount + 1)
     case arr: ArraySchema =>
-      this.copy(arraySchema = arr.merge(this.arraySchema).asInstanceOf[ArraySchema].some)
+      this.copy(arraySchema = arr.merge(this.arraySchema).asInstanceOf[ArraySchema].some, arraySchemaCount = arraySchemaCount + 1, totalCount = totalCount + 1)
     case str: StringSchema =>
-      this.copy(stringSchema = str.merge(this.stringSchema).asInstanceOf[StringSchema].some)
+      this.copy(stringSchema = str.merge(this.stringSchema).asInstanceOf[StringSchema].some, stringSchemaCount = stringSchemaCount + 1, totalCount = totalCount + 1)
     case int: IntegerSchema =>
       if (this.numberSchema.isDefined) // merge int to numberSchema's place and erase current integerSchema
-        this.copy(numberSchema = int.merge(this.numberSchema).asInstanceOf[NumberSchema].some, integerSchema = None)
+        this.copy(numberSchema = int.merge(this.numberSchema).asInstanceOf[NumberSchema].some, integerSchema = None, numberSchemaCount = numberSchemaCount + 1, totalCount = totalCount + 1)
       else                             // merge int as usual
-        this.copy(integerSchema = int.merge(this.integerSchema).asInstanceOf[IntegerSchema].some)
+        this.copy(integerSchema = int.merge(this.integerSchema).asInstanceOf[IntegerSchema].some, numberSchemaCount = numberSchemaCount + 1, totalCount = totalCount + 1)
     case num: NumberSchema =>          // number and integer can't co-exist in same product type
-      this.copy(integerSchema = None, numberSchema = num.merge(this.numberSchema).merge(this.integerSchema).asInstanceOf[NumberSchema].some)
+      this.copy(integerSchema = None, numberSchema = num.merge(this.numberSchema).merge(this.integerSchema).asInstanceOf[NumberSchema].some, numberSchemaCount = numberSchemaCount + 1, totalCount = totalCount + 1)
     case bool: BooleanSchema =>
-      this.copy(booleanSchema = bool.merge(this.booleanSchema).asInstanceOf[BooleanSchema].some)
+      this.copy(booleanSchema = bool.merge(this.booleanSchema).asInstanceOf[BooleanSchema].some, booleanSchemaCount = booleanSchemaCount + 1, totalCount = totalCount + 1)
     case nul: NullSchema =>
-      this.copy(nullSchema = nul.merge(this.nullSchema).asInstanceOf[NullSchema].some)
+      this.copy(nullSchema = nul.merge(this.nullSchema).asInstanceOf[NullSchema].some, nullSchemaCount = nullSchemaCount + 1, totalCount = totalCount + 1)
     case zer: ZeroSchema =>
       this
   }
@@ -108,12 +128,19 @@ final case class ProductSchema (
     //     type which is currently true for these types but is not enforced
     this.copy(
       objectSchema.map(_.transform(f).asInstanceOf[ObjectSchema]),
+      objectSchemaCount,
       arraySchema.map(_.transform(f).asInstanceOf[ArraySchema]),
+      arraySchemaCount,
       stringSchema.map(_.transform(f).asInstanceOf[StringSchema]),
+      stringSchemaCount,
       integerSchema.map(_.transform(f).asInstanceOf[IntegerSchema]),
       numberSchema.map(_.transform(f).asInstanceOf[NumberSchema]),
+      numberSchemaCount,
       booleanSchema.map(_.transform(f).asInstanceOf[BooleanSchema]),
-      nullSchema.map(_.transform(f).asInstanceOf[NullSchema])
+      booleanSchemaCount,
+      nullSchema.map(_.transform(f).asInstanceOf[NullSchema]),
+      nullSchemaCount,
+      totalCount
     )
 
   override def getJEnum = types.map(_.getJEnum).reduceOption((a, b) => b.merge(a))

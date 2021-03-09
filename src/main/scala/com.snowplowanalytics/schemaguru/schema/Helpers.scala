@@ -146,7 +146,7 @@ object Helpers extends Serializable {
       props.keySet ++ props.flatMap { case (k, v) => extractKeys(v) }
     case ArraySchema(items) =>
       extractKeys(items)
-    case ProductSchema(obj, arr, _, _, _, _, _) =>
+    case ProductSchema(obj, _, arr, _, _, _, _, _, _, _, _, _, _, _) =>
       obj.map(extractKeys(_)).getOrElse(Set.empty[String]) ++ arr.map(extractKeys(_)).getOrElse(Set.empty[String])
     case ObjectProductSchema(objs) =>
       objs.flatMap(extractKeys(_)).toSet
